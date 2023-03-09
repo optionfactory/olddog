@@ -20,6 +20,7 @@ pgx = "=0.7.1"
 codice_fiscale = "0.4.1"
 phonenumber = "0.3.1"
 serde = "1.0.152"
+emojis = "0.5.2"
 
 [dev-dependencies]
 pgx-tests = "=0.7.1"

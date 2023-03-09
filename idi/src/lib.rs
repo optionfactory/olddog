@@ -7,6 +7,11 @@ pub fn is_valid_fiscal_code(val: &str) -> bool {
     codice_fiscale::CodiceFiscale::check(val).is_ok()
 }
 
+#[pg_extern]
+pub fn emojify(code: &str) -> &'static str {
+    emojis::get_by_shortcode(code).expect("Invalid code").as_str()
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {

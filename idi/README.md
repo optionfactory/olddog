@@ -1,5 +1,5 @@
 ```sql
-DROP EXTENSION IF EXISTS idi;
+DROP EXTENSION IF EXISTS idi CASCADE;
 CREATE EXTENSION idi;
 ```
 
@@ -10,3 +10,6 @@ CREATE TABLE users (id INT, cf TEXT CHECK(is_valid_fiscal_code(cf)));
 INSERT INTO users (id, cf) VALUES (1, 'asd');
 ```
 
+```sql
+SELECT emojify('rocket');
+```
