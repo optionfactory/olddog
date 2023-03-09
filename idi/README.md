@@ -17,3 +17,9 @@ SELECT emojify('rocket');
 ```sql
 SELECT * FROM list_emojis() LIMIT 10;
 ```
+
+```sql
+SELECT 'https://localhost'::Url;
+
+SELECT is_secure('https://localhost');
+```

@@ -1,4 +1,8 @@
+use std::ffi::CStr;
+use std::io::Write;
 use pgx::prelude::*;
+use pgx::StringInfo;
+use serde::{Serialize, Deserialize};
 
 pg_module_magic!();
 
@@ -15,6 +19,35 @@ fn emojify(code: &str) -> &'static str {
 #[pg_extern]
 fn list_emojis() -> SetOfIterator<'static, &'static str> {
     SetOfIterator::new(emojis::iter().map(|e| e.as_str()))
+}
+
+#[derive(Serialize, Deserialize, PostgresType)]
+#[inoutfuncs]
+pub struct Url {
+    scheme: String,
+    host: String,
+}
+
+impl InOutFuncs for Url {
+    fn input(input: &CStr) -> Self where Self: Sized {
+        let mut parts = input.to_str().expect("Failed to convert to str")
+            .split("://")
+            .map(str::to_string);
+        Url {
+            scheme: parts.next().expect("missing scheme").to_string(),
+            host: parts.next().expect("missing host").to_string(),
+        }
+    }
+
+    fn output(&self, buffer: &mut StringInfo) {
+        let res = format!("{}://{}", self.scheme, self.host);
+        buffer.write(res.as_bytes()).unwrap();
+    }
+}
+
+#[pg_extern]
+fn is_secure(url: Url) -> bool {
+    url.scheme.ends_with("s")
 }
 
 #[cfg(any(test, feature = "pg_test"))]
