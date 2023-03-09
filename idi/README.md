@@ -13,3 +13,7 @@ INSERT INTO users (id, cf) VALUES (1, 'asd');
 ```sql
 SELECT emojify('rocket');
 ```
+
+```sql
+SELECT * FROM list_emojis() LIMIT 10;
+```

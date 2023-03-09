@@ -3,13 +3,18 @@ use pgx::prelude::*;
 pg_module_magic!();
 
 #[pg_extern]
-pub fn is_valid_fiscal_code(val: &str) -> bool {
+fn is_valid_fiscal_code(val: &str) -> bool {
     codice_fiscale::CodiceFiscale::check(val).is_ok()
 }
 
 #[pg_extern]
-pub fn emojify(code: &str) -> &'static str {
+fn emojify(code: &str) -> &'static str {
     emojis::get_by_shortcode(code).expect("Invalid code").as_str()
+}
+
+#[pg_extern]
+fn list_emojis() -> SetOfIterator<'static, &'static str> {
+    SetOfIterator::new(emojis::iter().map(|e| e.as_str()))
 }
 
 #[cfg(any(test, feature = "pg_test"))]
