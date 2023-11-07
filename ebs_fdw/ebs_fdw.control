@@ -1,4 +1,4 @@
-comment = 'ebs_fdw:  Created by pgx'
+comment = 'ebs_fdw:  Created by pgrx'
 default_version = '@CARGO_VERSION@'
 module_pathname = '$libdir/ebs_fdw'
 relocatable = false

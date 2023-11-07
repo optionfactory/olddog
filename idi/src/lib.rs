@@ -1,7 +1,7 @@
 use std::ffi::CStr;
 use std::io::Write;
-use pgx::prelude::*;
-use pgx::StringInfo;
+use pgrx::prelude::*;
+use pgrx::StringInfo;
 use serde::{Serialize, Deserialize};
 
 pg_module_magic!();

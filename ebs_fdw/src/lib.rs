@@ -13,7 +13,7 @@ use supabase_wrappers::prelude::*;
 use tokio::runtime::Runtime;
 
 // creates the metadata required to make our cdylib a valid postgres extension
-pgx::pg_module_magic!();
+pgrx::pg_module_magic!();
 
 // marks the struct as a foreign data wrapper, to export the necessary functions
 #[wrappers_fdw(
@@ -23,7 +23,7 @@ author = "OptionFactory",
 pub struct EbsFdw {
     runtime: Runtime,
     client: Client,
-    columns: Vec<String>,
+    columns: Vec<Column>,
     items: Option<Box<dyn Stream<Item=Result<Volume, SdkError<DescribeVolumesError>>> + Unpin>>,
 }
 
@@ -51,7 +51,7 @@ impl ForeignDataWrapper for EbsFdw {
 
     // Called by postgres at scan start
     // Parameters detail what is requested, including where clauses, sorts, limit
-    fn begin_scan(&mut self, quals: &[Qual], columns: &[String], _sorts: &[Sort], _limit: &Option<Limit>, _options: &HashMap<String, String>) {
+    fn begin_scan(&mut self, quals: &[Qual], columns: &[Column], _sorts: &[Sort], _limit: &Option<Limit>, _options: &HashMap<String, String>) {
 
         // uncomment to enable predicate pushdown
         // let filters = quals_to_filters(quals);
@@ -82,7 +82,7 @@ impl ForeignDataWrapper for EbsFdw {
         if let Some(vol) = item {
             row.clear();
             for column in &self.columns {
-                match column.as_str() {
+                match column.name.as_str() {
                     "id" => row.push("id", vol.volume_id().map(|id| Cell::String(id.to_string()))),
                     "name" => row.push("name", vol.tags().and_then(name_tag).map(Cell::String)),
                     "type" => row.push("type", vol.volume_type().map(|t| Cell::String(t.as_str().to_string()))),
@@ -115,7 +115,7 @@ fn quals_to_filters(quals: &[Qual]) -> Option<Vec<Filter>> {
     let filters = quals.iter()
         .filter_map(|qual|
             match qual {
-                Qual { field, operator, value: Value::Cell(value), use_or: false } if operator == "=" => {
+                Qual { field, operator, value: Value::Cell(value), use_or: false, .. } if operator == "=" => {
                     Some(Filter::builder().name(field).values(value.to_string()).build())
                 },
                 _ => None,
