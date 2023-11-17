@@ -53,7 +53,8 @@ fn is_secure(url: Url) -> bool {
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
-    use pgx::prelude::*;
+    use pgrx::prelude::*;
+
     use crate::is_valid_fiscal_code;
 
     #[pg_test]
@@ -69,6 +70,11 @@ mod tests {
     #[pg_test]
     fn can_check_is_valid_via_select() {
         assert_eq!(Some(true), Spi::get_one("SELECT is_valid_fiscal_code('RSSMRA85T10A562S')").unwrap());
+    }
+
+    #[pg_test]
+    fn can_resolve_emoji() {
+        assert_eq!(Some("🦀"), Spi::get_one("SELECT emojify('crab')").unwrap());
     }
 }
 
